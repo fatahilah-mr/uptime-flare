@@ -6,20 +6,9 @@ import {
   MonitorStateCompacted,
 } from '../../types/config'
 
-export async function getFromStore(env: Env | any, key: string): Promise<string | null> {
-  let d1 = env?.UPTIMEFLARE_D1
-  if (!d1) {
-    try {
-      const { getRequestContext } = require('@cloudflare/next-on-pages')
-      d1 = getRequestContext()?.env?.UPTIMEFLARE_D1
-    } catch (e) {}
-  }
-  if (!d1) {
-    console.error('UPTIMEFLARE_D1 database binding is missing or not bound!')
-    return null
-  }
-  const stmt = d1.prepare('SELECT value FROM uptimeflare WHERE key = ?')
-  const result = (await stmt.bind(key).first()) as { value: string } | null
+export async function getFromStore(env: Env, key: string): Promise<string | null> {
+  const stmt = env.UPTIMEFLARE_D1.prepare('SELECT value FROM uptimeflare WHERE key = ?')
+  const result = await stmt.bind(key).first<{ value: string }>()
   return result?.value || null
 }
 
