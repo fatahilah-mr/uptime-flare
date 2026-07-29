@@ -19,7 +19,7 @@ export async function getFromStore(env: Env | any, key: string): Promise<string 
     return null
   }
   const stmt = d1.prepare('SELECT value FROM uptimeflare WHERE key = ?')
-  const result = await stmt.bind(key).first<{ value: string }>()
+  const result = (await stmt.bind(key).first()) as { value: string } | null
   return result?.value || null
 }
 
